@@ -1,12 +1,9 @@
- 
 let movies = [];
 
-// Function to add a movie to the array
-function addMovie(title, year, genre, description) {
+function addMovie(title, year, genre, description){
   movies.push({ title: title, year: year, genre: genre, description: description });
 }
 
-// Sample movie data
 addMovie("North by Northwest", "1959", "Action", "One of the most beloved and iconic films from legendary director Alfred Hitchcock, North by Northwest follows advertising man Roger Thornhill, the furthest thing from an action hero. The film blends mystery, comedy, and action to create a perfect blending and one-of-a-kind experience that would prove to be highly influential for action movies as a whole. North by Northwest proves the creativity and magic of action movies as a whole, showing that highly exhilarating setpieces and sequences don't have to come from a standard hero storyline. The film's implementation of comedy was also highly effective for the era, creating a distinct style that was incredibly ahead of its time when it came to action comedy filmmaking.");
 addMovie("Princess Mononoke", "1997", "Action", "One of the very few animated action movies to be highly praised by IMDb, Princess Mononoke follows the story of Ashitaka, the prince of the disappearing Emishi people. In the west, he finds himself at the center of an ecological battle, with one side featuring San, a woman raised by wolves fighting to protect the forest, and the other side featuring Lady Eboshi, the leader of a local tribe looking to destroy the forest for the sake of her growing community. Despite the preconceived notions of an animated film, Princess Mononoke makes the most of the medium to create one of the most enthralling and exciting action movie experiences possible.");
 addMovie("Star Wars: Episode VI - Return of the Jedi", "1983", "Action", "The final chapter of the original sci-fi masterpiece trilogy, Return of the Jedi initially follows Luke Skywalker as he leads a mission to save his friend Han Solo from the clutches of the nefarious Jabba the Hutt. Luke must find the honor and power within himself to stop the Emperor as well as confront his father, Darth Vader. Capping off one of the most iconic and beloved science fiction franchises of all time is a tough task in itself, yet for the most part, Return of the Jedi acted as a highly satisfying finale for the franchise. ");
@@ -37,14 +34,14 @@ addMovie("Movie 3", "2016", "Horror", "Description of Movie 5");
 addMovie("Movie 4", "2016", "Horror", "Description of Movie 5");
 addMovie("Movie 5", "2016", "Horror", "Description of Movie 5");
 
-// Function to render movie posters
-function renderMoviePosters(movies) {
+function renderMoviePosters(movies){
   $("#movie-posters").empty();
-  if (movies.length === 0) {
+  if(movies.length === 0){
     $("#movie-posters").html("<p>No movies found for this genre.</p>");
-    return;
+    return; 
   }
-  movies.forEach(movie => {
+
+  movies.forEach(movie =>{
     const posterHTML = `
       <div class="col-md-4">
         <div class="card movie-poster">
@@ -60,22 +57,19 @@ function renderMoviePosters(movies) {
   });
 }
 
-// Function to filter movies by genre
-function filterMoviesByGenre(genre) {
+function filterMoviesByGenre(genre){
     const filteredMovies = movies.filter(movie => movie.genre === genre);
     renderMoviePosters(filteredMovies);
-  }
+}
 
-// Filter movies by genre
-$(".genre-link").click(function(e) {
+$(".genre-link").click(function(e){
   e.preventDefault();
   const genre = $(this).data("genre");
   const filteredMovies = movies.filter(movie => movie.genre === genre);
   renderMoviePosters(filteredMovies);
 });
 
-// Show movie details in modal
-$(document).on("click", ".view-details", function() {
+$(document).on("click", ".view-details", function(){
   const title = $(this).data("title");
   const year = $(this).data("year");
   const genre = $(this).data("genre");
@@ -90,121 +84,115 @@ $(document).on("click", ".view-details", function() {
   $("#movieDetailsModal .modal-body").html(modalBody);
 });
 
-// Initial render
+function addMovie(title, year, genre, description){
+  movies.push({ title: title, year: year, genre: genre, description: description });
+
+  const posterHTML = `
+    <div class="col-md-4 movie-card" data-genre="${genre}">
+      <div class="card movie-poster">
+        <div class="card-body">
+          <h5 class="card-title">${title}</h5>
+          <p class="card-text">${year}</p>
+          <p class="card-text">${genre}</p>
+          <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${title}" data-year="${year}" data-genre="${genre}" data-description="${description}">View Details</a>
+        </div>
+      </div>
+    </div>`;
+
+  $("#movie-posters").append(posterHTML);
+}
+
 renderMoviePosters(movies);
 
 
+$(document).ready(function(){
+  let isSubmitting = false;
 
-$(document).ready(function() {
-    // Flag variable to track form submission status
-    let isSubmitting = false;
+  $("#addMovieForm").submit(function(event){
+    event.preventDefault();
 
-    // Function to handle form submission
-    $("#addMovieForm").submit(function(event) {
-      event.preventDefault();
+    if(isSubmitting) return;
+    isSubmitting = true;
 
-      // If form submission is already in progress, return
-      if (isSubmitting) return;
+    const title = $("#movieTitle").val();
+    const year = $("#movieYear").val();
+    let genre = $("#movieGenre").val().trim().toLowerCase();
+    const description = $("#movieDescription").val();
       
-      // Set the flag to indicate that form submission is in progress
-      isSubmitting = true;
-
-      const title = $("#movieTitle").val();
-      const year = $("#movieYear").val();
-      let genre = $("#movieGenre").val().trim().toLowerCase(); // Ensure genre is trimmed and lowercase
-      const description = $("#movieDescription").val();
-      
-      // Validate movie title (not empty)
-      if (!title.trim()) {
-        alert("Please enter a valid movie title.");
-        resetForm();
-        return;
-      }
-
-      // Validate year (four-digit number)
-      const yearRegex = /^\d{4}$/;
-      if (!year.match(yearRegex)) {
-        alert("Please enter a valid four-digit year (YYYY).");
-        resetForm();
-        return;
-      }
-
-      // Validate movie genre (not empty)
-      if (!genre) {
-        alert("Please enter a valid movie genre.");
-        resetForm();
-        return;
-      }
-
-      // Validate movie description (not empty)
-      if (!description.trim()) {
-        alert("Please enter a valid movie description.");
-        resetForm();
-        return;
-      }
-
-      // If all validations pass, add the movie to the DOM
-      addMovie(title, year, genre, description);
-
-      // Reset the form
+    if(!title.trim()){
+      alert("Please enter a valid movie title.");
       resetForm();
-
-      // Show confirmation modal
-      $("#addMovieConfirmationModal").modal("show");
-
-      // Reset the flag immediately after submission
-      isSubmitting = false;
-
-      // Filter movies by the added movie's genre
-      filterMoviesByGenre(genre);
-    });
-
-    // Function to reset the form
-    function resetForm() {
-      $("#addMovieForm")[0].reset();
+      return;
     }
 
-    // Function to filter movies by genre
-    function filterMoviesByGenre(genre) {
-      $(".movie-card").hide();
-      $(`.movie-card[data-genre="${genre}"]`).show();
+    const yearRegex = /^\d{4}$/;
+    if(!year.match(yearRegex)) {
+      alert("Please enter a valid four-digit year (YYYY).");
+      resetForm();
+      return;
     }
+
+    if(!genre){
+      alert("Please enter a valid movie genre.");
+      resetForm();
+      return;
+    }
+
+    if(!description.trim()) {
+      alert("Please enter a valid movie description.");
+      resetForm();
+      return;
+    }
+
+    addMovie(title, year, genre, description);
+
+    resetForm();
+
+    $("#addMovieConfirmationModal").modal("show");
+
+    isSubmitting = false;
+
+    filterMoviesByGenre(genre);
   });
 
-  $(document).ready(function() {
-    // Function to fetch a random quote from Forismatic API
-    function fetchQuote() {
-        $.ajax({
-            jsonp: "jsonp",
-            dataType: "jsonp",
-            url: "http://api.forismatic.com/api/1.0/",
-            contentType: "application/jsonp",
-            data: {
-              lang: "en",
-              method: "getQuote",
-              format: 'jsonp'
-            },
-            success: function(response) {
-                // Extract the quote and author from the response
-                var quote = response.quoteText;
-                var author = response.quoteAuthor || "Unknown";
+  function resetForm(){
+    $("#addMovieForm")[0].reset();
+  }
+
+  function filterMoviesByGenre(genre){
+    $(".movie-card").hide();
+    $(`.movie-card[data-genre="${genre}"]`).show();
+  }
+});
+
+$(document).ready(function(){
+  function fetchQuote(){
+    $.ajax({
+      jsonp:"jsonp",
+      dataType:"jsonp",
+      url:"http://api.forismatic.com/api/1.0/",
+      contentType: "application/jsonp",
+      data: {
+      lang:"en",
+      method:"getQuote",
+      format:'jsonp'
+      },
+      success: function(response) {
+      var quote = response.quoteText;
+      var author = response.quoteAuthor || "Unknown";
+
+      $(".quote-text").html(quote);
+      $(".quote-author").html(author);
+      },
+      error:function(){
+        $(".quote-text").html("Failed to fetch a quote.");
+      }
+    });
+  }
+
+  $(".fetch-button").click(function(){
+    fetchQuote();
+  });
         
-                // Update the quote content on the webpage
-                $(".quote-text").html(quote);
-                $(".quote-author").html(author);
-              },
-              error: function() {
-                // Display an error message if the request fails
-                $(".quote-text").html("Failed to fetch a quote.");
-              }
-            });
-          }
-        
-          // Event listener for the button click
-          $(".fetch-button").click(function() {
-            fetchQuote();
-          });
-        
-          // Fetch a quote when the page loads
-          fetchQuote();
-        });
+  fetchQuote();
+});

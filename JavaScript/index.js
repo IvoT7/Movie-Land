@@ -1,7 +1,163 @@
 let movies = [];
+let selectedGenre = "";
 
 function addMovie(title, year, genre, description){
   movies.push({ title: title, year: year, genre: genre, description: description });
+
+  const selectedGenre = $(".genre-link.active").data("genre");
+  filterMoviesByGenre(selectedGenre);
+
+  if (selectedGenre && selectedGenre === genre){
+    const posterHTML = `
+      <div class="col-md-4 movie-card" data-genre="${genre}">
+        <div class="card movie-poster">
+          <div class="card-body">
+            <h5 class="card-title">${title}</h5>
+            <p class="card-text">${year}</p>
+            <p class="card-text">${genre}</p>
+            <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${title}" data-year="${year}" data-genre="${genre}" data-description="${description}">View Details</a>
+          </div>
+        </div>
+      </div>`;
+    $("#movie-posters").append(posterHTML);
+  }
+
+  filterMoviesByGenre(selectedGenre);
+}
+
+function filterMoviesByGenre(genre){
+  $("#movie-posters").empty();
+  
+  movies.forEach(movie =>{
+    if (!genre || movie.genre.toLowerCase() === genre.toLowerCase()){
+      const posterHTML = `
+        <div class="col-md-4 movie-card" data-genre="${movie.genre}">
+          <div class="card movie-poster">
+            <div class="card-body">
+              <h5 class="card-title">${movie.title}</h5>
+              <p class="card-text">${movie.year}</p>
+              <p class="card-text">${movie.genre}</p>
+              <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${movie.title}" data-year="${movie.year}" data-genre="${movie.genre}" data-description="${movie.description}">View Details</a>
+            </div>
+          </div>
+        </div>`;
+      $("#movie-posters").append(posterHTML);
+    }
+  });
+}
+
+$(document).on("click", ".view-details", function(){
+  const title = $(this).data("title");
+  const year = $(this).data("year");
+  const genre = $(this).data("genre");
+  const description = $(this).data("description");
+
+  $("#movieDetailsModal .modal-title").text(title);
+  const modalBody = `
+    <p><strong>Year:</strong> ${year}</p>
+    <p><strong>Genre:</strong> ${genre}</p>
+    <p><strong>Description:</strong> ${description}</p>
+  `;
+  $("#movieDetailsModal .modal-body").html(modalBody);
+});
+
+$(document).ready(function(){
+  let isSubmitting = false;
+
+  $(".dropdown-menu a").click(function(e){
+    e.preventDefault();
+    const selectedGenre = $(this).text();
+    renderMoviesByGenre(selectedGenre);
+  });
+
+  $("a[href='#movie-posters']").click(function(e){
+    e.preventDefault();
+    filterMoviesByGenre('');
+  });
+
+  $(".genre-link").click(function(e){
+    e.preventDefault();
+    selectedGenre = $(this).data("genre");
+    renderMoviesByGenre(selectedGenre);
+  });
+
+  $("#addMovieForm").submit(function(event){
+    event.preventDefault();
+
+    if(isSubmitting) return;
+    isSubmitting = true;
+
+    const title = $("#movieTitle").val();
+    const year = $("#movieYear").val();
+    let genre = $("#movieGenre").val().trim().toLowerCase();
+    const description = $("#movieDescription").val();
+      
+    if(!title.trim()){
+      alert("Please enter a valid movie title.");
+      resetForm();
+      return;
+    }
+
+    const yearRegex = /^\d{4}$/;
+    if(!year.match(yearRegex)){
+      alert("Please enter a valid four-digit year (YYYY).");
+      resetForm();
+      return;
+    }
+
+    if(!genre){
+      alert("Please enter a valid movie genre.");
+      resetForm();
+      return;
+    }
+
+    if(!description.trim()){
+      alert("Please enter a valid movie description.");
+      resetForm();
+      return;
+    }
+
+    addMovie(title, year, genre, description);
+
+    resetForm();
+
+    $("#addMovieConfirmationModal").modal("show");
+
+    isSubmitting = false;
+
+    filterMoviesByGenre(genre);
+  });
+
+  function resetForm(){
+    $("#addMovieForm")[0].reset();
+  }
+
+  $("a[href='#movie-posters']").click(function(e){
+    e.preventDefault();
+    filterMoviesByGenre('');
+  });
+});
+
+function renderMoviesByGenre(genre){
+  selectedGenre = genre;
+  $("#movie-posters").empty();
+
+  movies.forEach(movie =>{
+    if (!genre || movie.genre.toLowerCase()===genre.toLowerCase()){
+      const posterHTML = `
+        <div class="col-md-4 movie-card" data-genre="${movie.genre}">
+          <div class="card movie-poster">
+            <div class="card-body">
+              <h5 class="card-title">${movie.title}</h5>
+              <p class="card-text">${movie.year}</p>
+              <p class="card-text">${movie.genre}</p>
+              <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${movie.title}" data-year="${movie.year}" data-genre="${movie.genre}" data-description="${movie.description}">View Details</a>
+            </div>
+          </div>
+        </div>`;
+      $("#movie-posters").append(posterHTML);
+    }
+  });
 }
 
 addMovie("North by Northwest", "1959", "Action", "One of the most beloved and iconic films from legendary director Alfred Hitchcock, North by Northwest follows advertising man Roger Thornhill, the furthest thing from an action hero. The film blends mystery, comedy, and action to create a perfect blending and one-of-a-kind experience that would prove to be highly influential for action movies as a whole. North by Northwest proves the creativity and magic of action movies as a whole, showing that highly exhilarating setpieces and sequences don't have to come from a standard hero storyline. The film's implementation of comedy was also highly effective for the era, creating a distinct style that was incredibly ahead of its time when it came to action comedy filmmaking.");
@@ -33,137 +189,6 @@ addMovie("Movie 2", "2016", "Horror", "Description of Movie 5");
 addMovie("Movie 3", "2016", "Horror", "Description of Movie 5");
 addMovie("Movie 4", "2016", "Horror", "Description of Movie 5");
 addMovie("Movie 5", "2016", "Horror", "Description of Movie 5");
-
-function renderMoviePosters(movies){
-  $("#movie-posters").empty();
-  if(movies.length === 0){
-    $("#movie-posters").html("<p>No movies found for this genre.</p>");
-    return; 
-  }
-
-  movies.forEach(movie =>{
-    const posterHTML = `
-      <div class="col-md-4">
-        <div class="card movie-poster">
-          <div class="card-body">
-            <h5 class="card-title">${movie.title}</h5>
-            <p class="card-text">${movie.year}</p>
-            <p class="card-text">${movie.genre}</p>
-            <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${movie.title}" data-year="${movie.year}" data-genre="${movie.genre}" data-description="${movie.description}">View Details</a>
-          </div>
-        </div>
-      </div>`;
-    $("#movie-posters").append(posterHTML);
-  });
-}
-
-function filterMoviesByGenre(genre){
-    const filteredMovies = movies.filter(movie => movie.genre === genre);
-    renderMoviePosters(filteredMovies);
-}
-
-$(".genre-link").click(function(e){
-  e.preventDefault();
-  const genre = $(this).data("genre");
-  const filteredMovies = movies.filter(movie => movie.genre === genre);
-  renderMoviePosters(filteredMovies);
-});
-
-$(document).on("click", ".view-details", function(){
-  const title = $(this).data("title");
-  const year = $(this).data("year");
-  const genre = $(this).data("genre");
-  const description = $(this).data("description");
-
-  $("#movieDetailsModal .modal-title").text(title);
-  const modalBody = `
-    <p><strong>Year:</strong> ${year}</p>
-    <p><strong>Genre:</strong> ${genre}</p>
-    <p><strong>Description:</strong> ${description}</p>
-  `;
-  $("#movieDetailsModal .modal-body").html(modalBody);
-});
-
-function addMovie(title, year, genre, description){
-  movies.push({ title: title, year: year, genre: genre, description: description });
-
-  const posterHTML = `
-    <div class="col-md-4 movie-card" data-genre="${genre}">
-      <div class="card movie-poster">
-        <div class="card-body">
-          <h5 class="card-title">${title}</h5>
-          <p class="card-text">${year}</p>
-          <p class="card-text">${genre}</p>
-          <a href="#" class="btn btn-primary stretched-link view-details" data-bs-toggle="modal" data-bs-target="#movieDetailsModal" data-title="${title}" data-year="${year}" data-genre="${genre}" data-description="${description}">View Details</a>
-        </div>
-      </div>
-    </div>`;
-
-  $("#movie-posters").append(posterHTML);
-}
-
-renderMoviePosters(movies);
-
-
-$(document).ready(function(){
-  let isSubmitting = false;
-
-  $("#addMovieForm").submit(function(event){
-    event.preventDefault();
-
-    if(isSubmitting) return;
-    isSubmitting = true;
-
-    const title = $("#movieTitle").val();
-    const year = $("#movieYear").val();
-    let genre = $("#movieGenre").val().trim().toLowerCase();
-    const description = $("#movieDescription").val();
-      
-    if(!title.trim()){
-      alert("Please enter a valid movie title.");
-      resetForm();
-      return;
-    }
-
-    const yearRegex = /^\d{4}$/;
-    if(!year.match(yearRegex)) {
-      alert("Please enter a valid four-digit year (YYYY).");
-      resetForm();
-      return;
-    }
-
-    if(!genre){
-      alert("Please enter a valid movie genre.");
-      resetForm();
-      return;
-    }
-
-    if(!description.trim()) {
-      alert("Please enter a valid movie description.");
-      resetForm();
-      return;
-    }
-
-    addMovie(title, year, genre, description);
-
-    resetForm();
-
-    $("#addMovieConfirmationModal").modal("show");
-
-    isSubmitting = false;
-
-    filterMoviesByGenre(genre);
-  });
-
-  function resetForm(){
-    $("#addMovieForm")[0].reset();
-  }
-
-  function filterMoviesByGenre(genre){
-    $(".movie-card").hide();
-    $(`.movie-card[data-genre="${genre}"]`).show();
-  }
-});
 
 $(document).ready(function(){
   function fetchQuote(){

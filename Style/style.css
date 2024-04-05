@@ -4,6 +4,12 @@ body{
     color: #333;
     margin: 0;
     padding: 0;
+    transition: background-color 0.5s ease, color 0.3s ease;
+}
+
+body.dark-mode{
+    background-color: #111111;
+     color: #ffffff;
 }
 
 .container{
@@ -18,6 +24,12 @@ body{
     box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
     border: 1px solid #ccc;
+}
+
+.dark-mode .movie-poster {
+    background-color: #292929; 
+    border: 1px solid #444; 
+    color: #fff;
 }
 
 .movie-poster img{
@@ -74,6 +86,10 @@ body{
     font-size: 28px;
     margin-bottom: 30px;
     color: #333333;
+}
+
+.dark-mode #addMovieForm h2{
+    color: #fff;
 }
 
 #addMovieForm .form-label{
@@ -147,12 +163,17 @@ body{
 }
 
 .quote-text{
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
     font-size: 1.5rem;
     margin-bottom: 20px;
 }
 
 .quote-author{
     font-style: italic;
+    font-weight: bolder;
 }
 
 .fetch-button{
@@ -233,4 +254,67 @@ body{
 
 #scrollTopBtn:hover{
     background-color: #0056b3;
+}
+
+#darkModeToggle{
+    margin-left: auto;
+}
+
+.dark-mode #addMovieForm{
+    background-color: #292929;
+    color: #fff;
+}
+
+.dark-mode #addMovieForm .form-label{
+    color: #fff;
+}
+
+.dark-mode #addMovieForm .form-control{
+    background-color: #404040;
+    color: #fff;
+    border-color: #444;
+}
+
+.search-container{
+    position: relative;
+    width: 100%;
+}
+
+.search-wrapper{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.search-icon-container{
+    padding: 10px;
+}
+
+.search-icon{
+    color: #aaa;
+}
+
+.search-input{
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: inherit;
+}
+
+.search-input::placeholder{
+    font-weight: bold;
+}
+
+.search-input:focus{
+    border-color: #007bff;
+}
+
+.dark-mode .search-input{
+    color: #fff;
+    font-weight: bold;
 }

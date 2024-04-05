@@ -64,6 +64,24 @@ $(document).on("click", ".view-details", function(){
 $(document).ready(function(){
   let isSubmitting = false;
 
+  function filterMovies(keyword){
+    $(".movie-card").each(function(){
+      var movieName = $(this).find(".card-title").text().toLowerCase();
+      if(movieName.includes(keyword.toLowerCase())){
+        $(this).show();
+        }else{
+        $(this).hide();
+        }
+    });
+  }
+
+  $("#movieSearch").on("input", function(){
+    var searchKeyword = $(this).val().trim();
+    filterMovies(searchKeyword);
+  });
+
+  filterMovies("");
+
   $(".dropdown-menu a").click(function(e){
     e.preventDefault();
     const selectedGenre = $(this).text();
@@ -235,3 +253,15 @@ $(document).ready(function(){
     $('html, body').animate({scrollTop: 0}, 'slow');
   });
 });
+
+$("#darkModeToggle").click(function() {
+  $("body").toggleClass("dark-mode");
+});
+
+function handleFocus(){
+  document.getElementById("movieSearch").placeholder = "";
+}
+
+function handleBlur(){
+  document.getElementById("movieSearch").placeholder = "Search movies by name";
+}
